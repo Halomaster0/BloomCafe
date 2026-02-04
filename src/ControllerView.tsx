@@ -52,8 +52,8 @@ const ControllerView = () => {
     const [messages, setMessages] = useState<Message[]>([]);
     const [isLoading, setIsLoading] = useState(true);
 
-    const fetchData = async () => {
-        setIsLoading(true);
+    const fetchData = async (silent = false) => {
+        if (!silent) setIsLoading(true);
 
         const [ordersRes, reservationsRes, messagesRes] = await Promise.all([
             supabase.from('orders').select('*').order('created_at', { ascending: false }),
@@ -72,9 +72,9 @@ const ControllerView = () => {
         fetchData();
 
         // Real-time subscriptions
-        const ordersSub = supabase.channel('orders_realtime').on('postgres_changes' as any, { event: '*', table: 'orders', schema: 'public' }, () => fetchData()).subscribe();
-        const reservationsSub = supabase.channel('reservations_realtime').on('postgres_changes' as any, { event: '*', table: 'reservations', schema: 'public' }, () => fetchData()).subscribe();
-        const messagesSub = supabase.channel('messages_realtime').on('postgres_changes' as any, { event: '*', table: 'contact_messages', schema: 'public' }, () => fetchData()).subscribe();
+        const ordersSub = supabase.channel('orders_realtime').on('postgres_changes' as any, { event: '*', table: 'orders', schema: 'public' }, () => fetchData(true)).subscribe();
+        const reservationsSub = supabase.channel('reservations_realtime').on('postgres_changes' as any, { event: '*', table: 'reservations', schema: 'public' }, () => fetchData(true)).subscribe();
+        const messagesSub = supabase.channel('messages_realtime').on('postgres_changes' as any, { event: '*', table: 'contact_messages', schema: 'public' }, () => fetchData(true)).subscribe();
 
         return () => {
             supabase.removeChannel(ordersSub);
@@ -84,30 +84,81 @@ const ControllerView = () => {
     }, []);
 
     const updateOrderStatus = async (orderId: string, newStatus: Order['status']) => {
-        await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+        // Optimistic update for immediate feedback
+        setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+
+        const { error } = await supabase.from('orders').update({ status: newStatus }).eq('id', orderId);
+        if (error) {
+            console.error('Error updating order:', error);
+            fetchData(true); // Revert on error
+        }
     };
 
     const deleteReservation = async (id: string) => {
         if (window.confirm('Cancel this reservation?')) {
             await supabase.from('reservations').delete().eq('id', id);
+            // Subscription will handle refresh
         }
     };
 
     const markMessageRead = async (id: string) => {
+        // Optimistic update
+        setMessages(prev => prev.map(m => m.id === id ? { ...m, is_read: true } : m));
         await supabase.from('contact_messages').update({ is_read: true }).eq('id', id);
+    };
+
+    const clearOrders = async () => {
+        if (window.confirm('Clear all orders? This cannot be undone.')) {
+            const { error } = await supabase.from('orders').delete().neq('status', 'not_a_status');
+            if (error) console.error(error);
+            else setOrders([]);
+        }
+    };
+
+    const clearReservations = async () => {
+        if (window.confirm('Clear all bookings? This cannot be undone.')) {
+            const { error } = await supabase.from('reservations').delete().neq('status', 'not_a_status');
+            if (error) console.error(error);
+            else setReservations([]);
+        }
+    };
+
+    const clearMessages = async () => {
+        if (window.confirm('Clear all messages? This cannot be undone.')) {
+            const { error } = await supabase.from('contact_messages').delete().neq('email', 'not_an_email');
+            if (error) console.error(error);
+            else setMessages([]);
+        }
     };
 
     return (
         <div className="min-h-screen bg-[#F7F6F2] font-sans text-[#111C16]">
-            {/* Sidebar / Top Nav */}
             <div className="max-w-7xl mx-auto p-6 lg:p-12">
                 <header className="flex flex-col md:flex-row items-start md:items-center justify-between gap-8 mb-12">
-                    <div>
-                        <h1 className="bloom-heading text-4xl lg:text-5xl mb-2">Staff Hub</h1>
-                        <p className="bloom-body text-[#6B7A70]">Your central inbox for everything Bloom.</p>
+                    <div className="flex flex-col md:flex-row md:items-center gap-6 w-full justify-between">
+                        <div>
+                            <h1 className="bloom-heading text-4xl lg:text-5xl mb-2">Staff Hub</h1>
+                            <p className="bloom-body text-[#6B7A70]">Your central inbox for everything Bloom.</p>
+                        </div>
+
+                        {activeTab === 'orders' && orders.length > 0 && (
+                            <button onClick={clearOrders} className="text-xs font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors flex items-center gap-2 bg-red-50 px-4 py-2 rounded-xl border border-red-100">
+                                <Trash2 className="w-3 h-3" /> Clear Orders
+                            </button>
+                        )}
+                        {activeTab === 'reservations' && reservations.length > 0 && (
+                            <button onClick={clearReservations} className="text-xs font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors flex items-center gap-2 bg-red-50 px-4 py-2 rounded-xl border border-red-100">
+                                <Trash2 className="w-3 h-3" /> Clear Bookings
+                            </button>
+                        )}
+                        {activeTab === 'messages' && messages.length > 0 && (
+                            <button onClick={clearMessages} className="text-xs font-bold uppercase tracking-widest text-red-500 hover:text-red-700 transition-colors flex items-center gap-2 bg-red-50 px-4 py-2 rounded-xl border border-red-100">
+                                <Trash2 className="w-3 h-3" /> Clear Inbox
+                            </button>
+                        )}
                     </div>
 
-                    <div className="flex bg-white/50 backdrop-blur-sm p-1.5 rounded-2xl border border-black/5 self-stretch md:self-auto">
+                    <div className="flex bg-white/50 backdrop-blur-sm p-1.5 rounded-2xl border border-black/5 self-stretch md:self-auto flex-shrink-0">
                         <button
                             onClick={() => setActiveTab('orders')}
                             className={`flex-1 md:flex-none flex items-center gap-2 px-6 py-3 rounded-xl transition-all font-bold text-sm ${activeTab === 'orders' ? 'bg-[#013A1E] text-white shadow-lg' : 'hover:bg-black/5'
