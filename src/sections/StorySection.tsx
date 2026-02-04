@@ -73,7 +73,7 @@ const StorySection = ({ className = '' }: StorySectionProps) => {
             className="bloom-card w-full lg:w-[26vw] h-[35vh] lg:h-[44vh]"
           >
             <img
-              src="/images/story_roast.jpg"
+              src="images/story_roast.jpg"
               alt="Coffee roasting"
               className="w-full h-full object-cover"
             />
@@ -85,7 +85,7 @@ const StorySection = ({ className = '' }: StorySectionProps) => {
             className="bloom-card w-full lg:w-[30vw] h-[40vh] lg:h-[52vh]"
           >
             <img
-              src="/images/story_pourover.jpg"
+              src="images/story_pourover.jpg"
               alt="Pourover coffee"
               className="w-full h-full object-cover"
             />
@@ -97,7 +97,7 @@ const StorySection = ({ className = '' }: StorySectionProps) => {
             className="bloom-card w-full lg:w-[26vw] h-[35vh] lg:h-[44vh]"
           >
             <img
-              src="/images/story_team.jpg"
+              src="images/story_team.jpg"
               alt="Barista service"
               className="w-full h-full object-cover"
             />

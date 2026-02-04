@@ -35,11 +35,11 @@ const GallerySection = ({ className = '' }: { className?: string }) => {
     }, []);
 
     const items = [
-        { src: '/images/gallery1.jpg', span: 'col-span-2 row-span-2' },
-        { src: '/images/gallery2.jpg', span: 'col-span-1 row-span-1' },
-        { src: '/images/gallery3.jpg', span: 'col-span-1 row-span-1' },
-        { src: '/images/gallery4.jpg', span: 'col-span-1 row-span-2' },
-        { src: '/images/gallery5.jpg', span: 'col-span-1 row-span-1' },
+        { src: 'images/gallery1.jpg', span: 'col-span-2 row-span-2' },
+        { src: 'images/gallery2.jpg', span: 'col-span-1 row-span-1' },
+        { src: 'images/gallery3.jpg', span: 'col-span-1 row-span-1' },
+        { src: 'images/gallery4.jpg', span: 'col-span-1 row-span-2' },
+        { src: 'images/gallery5.jpg', span: 'col-span-1 row-span-1' },
     ];
 
     return (

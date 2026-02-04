@@ -102,7 +102,7 @@ const EventsSection = ({ className = '' }: EventsSectionProps) => {
             className="bloom-card w-full lg:w-[40vw] h-[40vh] lg:h-[56vh] flex-shrink-0"
           >
             <img
-              src="/images/events_gathering.jpg"
+              src="images/events_gathering.jpg"
               alt="Private event"
               className="w-full h-full object-cover"
             />
@@ -117,7 +117,7 @@ const EventsSection = ({ className = '' }: EventsSectionProps) => {
               Events & Private Hire
             </h2>
             <p className="bloom-body text-base text-[#6B7A70] mb-8 leading-relaxed">
-              Host your next celebration with us. We offer custom menus, 
+              Host your next celebration with us. We offer custom menus,
               dedicated service, and a warm, botanical setting.
             </p>
 
@@ -137,7 +137,7 @@ const EventsSection = ({ className = '' }: EventsSectionProps) => {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => setIsDialogOpen(true)}
               className="bloom-button-primary w-fit flex items-center gap-2 group"
             >
@@ -177,7 +177,7 @@ const EventsSection = ({ className = '' }: EventsSectionProps) => {
                 className="w-full px-4 py-3 rounded-xl bg-[#013A1E]/5 border-none bloom-body text-sm text-[#111C16] placeholder:text-[#6B7A70] resize-none"
               />
             </div>
-            <Button 
+            <Button
               className="w-full bg-[#013A1E] hover:bg-[#025c30] text-[#F7F6F2] rounded-full py-6"
               onClick={() => setIsDialogOpen(false)}
             >

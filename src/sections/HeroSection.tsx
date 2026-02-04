@@ -93,7 +93,7 @@ const HeroSection = ({ className = '' }: HeroSectionProps) => {
       <div className="absolute inset-0 z-0">
         <div className="absolute inset-0 bg-black/40 z-10" /> {/* Dimmer overlay */}
         <img
-          src="/images/IMG_9064.jpeg"
+          src="images/IMG_9064.jpeg"
           className="w-full h-full object-cover opacity-60 scale-105"
           alt="Lounge Background"
         />

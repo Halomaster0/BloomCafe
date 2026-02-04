@@ -102,7 +102,7 @@ const ReserveSection = ({ className = '' }: ReserveSectionProps) => {
             className="bloom-card w-full lg:w-[40vw] h-[40vh] lg:h-[56vh] flex-shrink-0 lg:ml-auto"
           >
             <img
-              src="/images/reserve_table.jpg"
+              src="images/reserve_table.jpg"
               alt="Reserved table"
               className="w-full h-full object-cover"
             />

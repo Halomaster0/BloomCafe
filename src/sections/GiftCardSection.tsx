@@ -105,7 +105,7 @@ const GiftCardSection = ({ className = '' }: GiftCardSectionProps) => {
               Gift Cards
             </h2>
             <p className="bloom-body text-base text-[#6B7A70] mb-8 leading-relaxed">
-              Give the Bloom experience. Available in any amount—delivered 
+              Give the Bloom experience. Available in any amount—delivered
               digitally or in-store.
             </p>
 
@@ -121,7 +121,7 @@ const GiftCardSection = ({ className = '' }: GiftCardSectionProps) => {
               </div>
             </div>
 
-            <button 
+            <button
               onClick={() => setIsDialogOpen(true)}
               className="bloom-button-gold w-fit flex items-center gap-2 group"
             >
@@ -136,7 +136,7 @@ const GiftCardSection = ({ className = '' }: GiftCardSectionProps) => {
             className="bloom-card w-full lg:w-[40vw] h-[40vh] lg:h-[56vh] flex-shrink-0 lg:ml-auto"
           >
             <img
-              src="/images/gift_card.jpg"
+              src="images/gift_card.jpg"
               alt="Gift card"
               className="w-full h-full object-cover"
             />
@@ -176,7 +176,7 @@ const GiftCardSection = ({ className = '' }: GiftCardSectionProps) => {
                 <span className="bloom-body text-xs text-[#111C16]">Physical</span>
               </button>
             </div>
-            <Button 
+            <Button
               className="w-full bg-[#D4A72C] hover:bg-[#e5b83d] text-[#111C16] rounded-full py-6"
               onClick={() => setIsDialogOpen(false)}
             >

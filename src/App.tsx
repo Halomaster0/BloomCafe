@@ -30,7 +30,8 @@ function App() {
 
   useEffect(() => {
     const handleRoute = () => {
-      setIsStaffView(window.location.pathname === '/controller');
+      const params = new URLSearchParams(window.location.search);
+      setIsStaffView(params.get('view') === 'controller' || window.location.pathname === '/controller');
     };
     handleRoute();
     window.addEventListener('popstate', handleRoute);

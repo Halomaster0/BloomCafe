@@ -46,19 +46,19 @@ const ReviewsSection = ({ className = '' }: ReviewsSectionProps) => {
   const reviews = [
     {
       name: 'Amina',
-      avatar: '/images/avatar_amina.jpg',
+      avatar: 'images/avatar_amina.jpg',
       quote: 'The calmest coffee spot in the city.',
       rating: 5,
     },
     {
       name: 'Jared',
-      avatar: '/images/avatar_jared.jpg',
+      avatar: 'images/avatar_jared.jpg',
       quote: 'They remembered my order on the second visit.',
       rating: 5,
     },
     {
       name: 'Priya',
-      avatar: '/images/avatar_priya.jpg',
+      avatar: 'images/avatar_priya.jpg',
       quote: 'Perfect for slow mornings and deep work.',
       rating: 5,
     },

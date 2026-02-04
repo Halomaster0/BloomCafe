@@ -83,7 +83,7 @@ const TableOrderSection = ({ className = '' }: TableOrderSectionProps) => {
           className="bloom-card w-full lg:w-[45vw] h-[50vh] flex-shrink-0"
         >
           <img
-            src="/images/table_order.jpg"
+            src="images/table_order.jpg"
             alt="Table QR ordering"
             className="w-full h-full object-cover"
           />

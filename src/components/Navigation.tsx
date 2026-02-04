@@ -48,7 +48,7 @@ const Navigation = () => {
             className="flex items-center gap-3 group"
           >
             <img
-              src="/images/logo.jpg"
+              src="images/logo.jpg"
               alt="The Bloom Coffee"
               className="w-10 h-10 rounded-full object-cover border border-[#D4A72C]/30"
             />

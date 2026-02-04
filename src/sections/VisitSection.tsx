@@ -82,7 +82,7 @@ const VisitSection = ({ className = '' }: VisitSectionProps) => {
             className="bloom-card w-full lg:w-[40vw] h-[40vh] lg:h-[56vh] flex-shrink-0"
           >
             <img
-              src="/images/visit_exterior.jpg"
+              src="images/visit_exterior.jpg"
               alt="Cafe exterior"
               className="w-full h-full object-cover"
             />

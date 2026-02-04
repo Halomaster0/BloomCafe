@@ -111,7 +111,7 @@ const DailyBrewSection = ({ className = '' }: DailyBrewSectionProps) => {
             className="bloom-card w-full lg:w-[40vw] h-[40vh] lg:h-[56vh] flex-shrink-0"
           >
             <img
-              src="/images/daily_brew_latte.jpg"
+              src="images/daily_brew_latte.jpg"
               alt="Golden Latte"
               className="w-full h-full object-cover"
             />
@@ -135,7 +135,7 @@ const DailyBrewSection = ({ className = '' }: DailyBrewSectionProps) => {
               Golden Latte
             </h2>
             <p className="bloom-body text-base text-[#6B7A70] mb-8 leading-relaxed">
-              Espresso steamed with turmeric, cinnamon, and a touch of honey. 
+              Espresso steamed with turmeric, cinnamon, and a touch of honey.
               Warm, earthy, and just sweet enough.
             </p>
             <button className="bloom-button-primary w-fit flex items-center gap-2 group">

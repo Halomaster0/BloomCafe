@@ -121,7 +121,7 @@ const MenuSection = ({ className = '' }: MenuSectionProps) => {
             className="bloom-card w-full lg:w-[35vw] h-[40vh] lg:h-[60vh] flex-shrink-0 lg:ml-auto"
           >
             <img
-              src="/images/menu_pastries.jpg"
+              src="images/menu_pastries.jpg"
               alt="Pastries and coffee"
               className="w-full h-full object-cover"
             />
