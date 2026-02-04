@@ -1,5 +1,6 @@
 import React, { createContext, useContext, useState } from 'react';
 import type { MenuItem } from './constants/menuData';
+import { supabase } from './lib/supabase';
 
 interface CartItem extends MenuItem {
     quantity: number;
@@ -10,7 +11,7 @@ interface CartContextType {
     addToCart: (item: MenuItem) => void;
     removeFromCart: (itemName: string) => void;
     clearCart: () => void;
-    placeOrder: (tableId: string) => void;
+    placeOrder: (tableId: string) => Promise<void>;
     subtotal: number;
     isMenuOpen: boolean;
     setIsMenuOpen: (isOpen: boolean) => void;
@@ -42,24 +43,25 @@ export const CartProvider: React.FC<{ children: React.ReactNode }> = ({ children
 
     const clearCart = () => setCart([]);
 
-    const placeOrder = (tableId: string) => {
+    const placeOrder = async (tableId: string) => {
         if (cart.length === 0) return;
 
-        const order = {
-            id: Math.random().toString(36).substring(2, 9),
-            tableId,
+        const orderData = {
+            table_id: tableId,
             items: cart,
             total: subtotal,
-            timestamp: new Date().toISOString(),
             status: 'pending'
         };
 
-        // Store in localStorage for Controller view sync
-        const existingOrders = JSON.parse(localStorage.getItem('bloom_orders') || '[]');
-        localStorage.setItem('bloom_orders', JSON.stringify([...existingOrders, order]));
+        const { error } = await supabase
+            .from('orders')
+            .insert([orderData]);
 
-        // Trigger storage event for same-tab listeners (though usually for cross-tab)
-        window.dispatchEvent(new Event('storage'));
+        if (error) {
+            console.error('Error placing order:', error);
+            alert('Failed to place order. Please try again.');
+            return;
+        }
 
         clearCart();
     };

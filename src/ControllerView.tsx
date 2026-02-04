@@ -1,39 +1,78 @@
 import { useEffect, useState } from 'react';
 import { ShoppingBag, Clock, CheckCircle2, ChevronRight, Hash } from 'lucide-react';
+import { supabase } from './lib/supabase';
 
 interface Order {
     id: string;
-    tableId: string;
+    table_id: string;
     items: Array<{ name: string, quantity: number, price: number }>;
     total: number;
-    timestamp: string;
+    created_at: string;
     status: 'pending' | 'preparing' | 'served';
 }
 
 const ControllerView = () => {
     const [orders, setOrders] = useState<Order[]>([]);
 
-    const loadOrders = () => {
-        const saved = JSON.parse(localStorage.getItem('bloom_orders') || '[]');
-        setOrders(saved);
+    const loadOrders = async () => {
+        const { data, error } = await supabase
+            .from('orders')
+            .select('*')
+            .order('created_at', { ascending: false });
+
+        if (error) {
+            console.error('Error loading orders:', error);
+        } else {
+            setOrders(data || []);
+        }
     };
 
     useEffect(() => {
         loadOrders();
-        window.addEventListener('storage', loadOrders);
-        return () => window.removeEventListener('storage', loadOrders);
+
+        // Subscribe to real-time changes
+        const channel = supabase
+            .channel('orders_channel')
+            .on(
+                'postgres_changes',
+                { event: '*', table: 'orders', schema: 'public' },
+                () => {
+                    loadOrders();
+                }
+            )
+            .subscribe();
+
+        return () => {
+            supabase.removeChannel(channel);
+        };
     }, []);
 
-    const updateStatus = (orderId: string, newStatus: Order['status']) => {
-        const updated = orders.map(o => o.id === orderId ? { ...o, status: newStatus } : o);
-        setOrders(updated);
-        localStorage.setItem('bloom_orders', JSON.stringify(updated));
+    const updateStatus = async (orderId: string, newStatus: Order['status']) => {
+        const { error } = await supabase
+            .from('orders')
+            .update({ status: newStatus })
+            .eq('id', orderId);
+
+        if (error) {
+            console.error('Error updating status:', error);
+        } else {
+            // Optimistic update or just let the subscription handle it
+            setOrders(prev => prev.map(o => o.id === orderId ? { ...o, status: newStatus } : o));
+        }
     };
 
-    const clearOrders = () => {
-        if (window.confirm('Clear all order history?')) {
-            localStorage.setItem('bloom_orders', '[]');
-            setOrders([]);
+    const clearOrders = async () => {
+        if (window.confirm('Clear all order history? (Note: This will delete from database)')) {
+            const { error } = await supabase
+                .from('orders')
+                .delete()
+                .neq('status', 'not_a_status'); // Hacky way to delete all if no policy prevents it
+
+            if (error) {
+                console.error('Error clearing orders:', error);
+            } else {
+                setOrders([]);
+            }
         }
     };
 
@@ -60,7 +99,7 @@ const ControllerView = () => {
                 </header>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-                    {orders.slice().reverse().map((order) => (
+                    {orders.map((order) => (
                         <div
                             key={order.id}
                             className={`bloom-card bg-white rounded-[32px] p-8 border border-[#111C16]/5 transition-all ${order.status === 'served' ? 'opacity-60 grayscale' : 'shadow-xl scale-[1.02]'
@@ -69,11 +108,11 @@ const ControllerView = () => {
                             <div className="flex justify-between items-start mb-6">
                                 <div className="flex items-center gap-3 bg-[#013A1E]/5 px-4 py-2 rounded-2xl">
                                     <Hash className="w-4 h-4 text-[#013A1E]" />
-                                    <span className="font-black text-xl text-[#013A1E]">{order.tableId}</span>
+                                    <span className="font-black text-xl text-[#013A1E]">{order.table_id}</span>
                                 </div>
                                 <div className="text-right">
                                     <p className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold">Order ID</p>
-                                    <p className="font-mono text-xs">{order.id}</p>
+                                    <p className="font-mono text-xs">{order.id.split('-')[0]}</p>
                                 </div>
                             </div>
 
@@ -96,20 +135,20 @@ const ControllerView = () => {
                                     <p className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold">Time</p>
                                     <div className="flex items-center gap-2 text-[#111C16]">
                                         <Clock className="w-3 h-3" />
-                                        <span className="text-xs font-bold">{new Date(order.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
+                                        <span className="text-xs font-bold">{new Date(order.created_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })}</span>
                                     </div>
                                 </div>
                                 <div className="flex justify-between items-center pt-2">
                                     <p className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold">Subtotal</p>
-                                    <p className="text-sm font-bold text-[#111C16]">${order.total.toFixed(2)}</p>
+                                    <p className="text-sm font-bold text-[#111C16]">${Number(order.total).toFixed(2)}</p>
                                 </div>
                                 <div className="flex justify-between items-center">
                                     <p className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold">Tax (13%)</p>
-                                    <p className="text-sm font-bold text-[#111C16]">${(order.total * 0.13).toFixed(2)}</p>
+                                    <p className="text-sm font-bold text-[#111C16]">${(Number(order.total) * 0.13).toFixed(2)}</p>
                                 </div>
                                 <div className="flex justify-between items-center pt-2 border-t border-[#111C16]/5">
                                     <p className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold">Total</p>
-                                    <p className="text-2xl font-black text-[#013A1E]">${(order.total * 1.13).toFixed(2)}</p>
+                                    <p className="text-2xl font-black text-[#013A1E]">${(Number(order.total) * 1.13).toFixed(2)}</p>
                                 </div>
                             </div>
 
