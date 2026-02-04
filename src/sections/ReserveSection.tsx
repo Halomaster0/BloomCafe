@@ -1,7 +1,7 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { ArrowRight, Calendar, Users, Clock } from 'lucide-react';
+import { ArrowRight, Loader2 } from 'lucide-react';
 import {
   Dialog,
   DialogContent,
@@ -9,6 +9,7 @@ import {
   DialogTitle,
 } from '@/components/ui/dialog';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -21,6 +22,14 @@ const ReserveSection = ({ className = '' }: ReserveSectionProps) => {
   const imageRef = useRef<HTMLDivElement>(null);
   const textRef = useRef<HTMLDivElement>(null);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [reservationData, setReservationData] = useState({
+    name: '',
+    email: '',
+    guests: '2',
+    date: '',
+    time: ''
+  });
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -50,6 +59,35 @@ const ReserveSection = ({ className = '' }: ReserveSectionProps) => {
 
     return () => ctx.revert();
   }, []);
+
+  const handleReserve = async (e: React.FormEvent) => {
+    e.preventDefault();
+    setIsSubmitting(true);
+
+    const { error } = await supabase
+      .from('reservations')
+      .insert([
+        {
+          name: reservationData.name,
+          email: reservationData.email,
+          guests: parseInt(reservationData.guests),
+          date: reservationData.date,
+          time: reservationData.time,
+          status: 'confirmed'
+        }
+      ]);
+
+    setIsSubmitting(false);
+
+    if (error) {
+      console.error('Reservation error:', error);
+      alert('Failed to book reservation. Please try again.');
+    } else {
+      alert('Reservation confirmed! We look forward to seeing you.');
+      setIsDialogOpen(false);
+      setReservationData({ name: '', email: '', guests: '2', date: '', time: '' });
+    }
+  };
 
   return (
     <section
@@ -112,32 +150,81 @@ const ReserveSection = ({ className = '' }: ReserveSectionProps) => {
 
       {/* Reservation Dialog */}
       <Dialog open={isDialogOpen} onOpenChange={setIsDialogOpen}>
-        <DialogContent className="bg-[#F7F6F2] border-none rounded-[28px] max-w-md">
+        <DialogContent className="bg-[#F7F6F2] border-none rounded-[28px] max-w-md p-8 overflow-hidden">
           <DialogHeader>
-            <DialogTitle className="bloom-heading text-2xl text-[#111C16]">
+            <DialogTitle className="bloom-heading text-2xl text-[#111C16] mb-4">
               Reserve Your Table
             </DialogTitle>
           </DialogHeader>
-          <div className="space-y-4 pt-4">
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-[#013A1E]/5">
-              <Calendar className="w-5 h-5 text-[#013A1E]" />
-              <span className="bloom-body text-sm text-[#111C16]">Select date</span>
+          <form onSubmit={handleReserve} className="space-y-4">
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold px-1">Full Name</label>
+              <input
+                type="text"
+                required
+                placeholder="Ex. John Doe"
+                className="w-full px-4 py-3 rounded-xl bg-[#013A1E]/5 border border-transparent focus:border-[#D4A72C] focus:outline-none bloom-body text-sm transition-all"
+                value={reservationData.name}
+                onChange={e => setReservationData({ ...reservationData, name: e.target.value })}
+              />
             </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-[#013A1E]/5">
-              <Clock className="w-5 h-5 text-[#013A1E]" />
-              <span className="bloom-body text-sm text-[#111C16]">Select time</span>
+
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold px-1">Email</label>
+              <input
+                type="email"
+                required
+                placeholder="Ex. john@example.com"
+                className="w-full px-4 py-3 rounded-xl bg-[#013A1E]/5 border border-transparent focus:border-[#D4A72C] focus:outline-none bloom-body text-sm transition-all"
+                value={reservationData.email}
+                onChange={e => setReservationData({ ...reservationData, email: e.target.value })}
+              />
             </div>
-            <div className="flex items-center gap-3 p-3 rounded-xl bg-[#013A1E]/5">
-              <Users className="w-5 h-5 text-[#013A1E]" />
-              <span className="bloom-body text-sm text-[#111C16]">Number of guests</span>
+
+            <div className="grid grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold px-1">Date</label>
+                <input
+                  type="date"
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-[#013A1E]/5 border border-transparent focus:border-[#D4A72C] focus:outline-none bloom-body text-sm transition-all"
+                  value={reservationData.date}
+                  onChange={e => setReservationData({ ...reservationData, date: e.target.value })}
+                />
+              </div>
+              <div className="space-y-1">
+                <label className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold px-1">Time</label>
+                <input
+                  type="time"
+                  required
+                  className="w-full px-4 py-3 rounded-xl bg-[#013A1E]/5 border border-transparent focus:border-[#D4A72C] focus:outline-none bloom-body text-sm transition-all"
+                  value={reservationData.time}
+                  onChange={e => setReservationData({ ...reservationData, time: e.target.value })}
+                />
+              </div>
             </div>
+
+            <div className="space-y-1">
+              <label className="text-[10px] uppercase tracking-widest text-[#6B7A70] font-bold px-1">Number of Guests</label>
+              <select
+                className="w-full px-4 py-3 rounded-xl bg-[#013A1E]/5 border border-transparent focus:border-[#D4A72C] focus:outline-none bloom-body text-sm transition-all"
+                value={reservationData.guests}
+                onChange={e => setReservationData({ ...reservationData, guests: e.target.value })}
+              >
+                {[1, 2, 3, 4, 5, 6, 7, 8].map(n => (
+                  <option key={n} value={n}>{n} {n === 1 ? 'Guest' : 'Guests'}</option>
+                ))}
+              </select>
+            </div>
+
             <Button
-              className="w-full bg-[#013A1E] hover:bg-[#025c30] text-[#F7F6F2] rounded-full py-6"
-              onClick={() => setIsDialogOpen(false)}
+              type="submit"
+              disabled={isSubmitting}
+              className="w-full bg-[#013A1E] hover:bg-[#D4A72C] text-[#F7F6F2] hover:text-[#111C16] rounded-full py-6 font-bold transition-all mt-4"
             >
-              Confirm Reservation
+              {isSubmitting ? <Loader2 className="w-5 h-5 animate-spin" /> : 'Confirm Reservation'}
             </Button>
-          </div>
+          </form>
         </DialogContent>
       </Dialog>
     </section>

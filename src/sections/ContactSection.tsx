@@ -1,8 +1,9 @@
 import { useLayoutEffect, useRef, useState } from 'react';
 import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
-import { Send, MapPin, Phone, Mail, Instagram, Facebook, X } from 'lucide-react';
+import { Send, MapPin, Phone, Mail, Instagram, Facebook, X, Loader2 } from 'lucide-react';
 import { Button } from '@/components/ui/button';
+import { supabase } from '@/lib/supabase';
 
 gsap.registerPlugin(ScrollTrigger);
 
@@ -22,6 +23,7 @@ const ContactSection = ({ className = '' }: ContactSectionProps) => {
   const formRef = useRef<HTMLDivElement>(null);
   const [formData, setFormData] = useState({ name: '', email: '', message: '' });
   const [toasts, setToasts] = useState<Toast[]>([]);
+  const [isSubmitting, setIsSubmitting] = useState(false);
 
   useLayoutEffect(() => {
     const section = sectionRef.current;
@@ -64,10 +66,29 @@ const ContactSection = ({ className = '' }: ContactSectionProps) => {
     setToasts((prev) => prev.filter((t) => t.id !== id));
   };
 
-  const handleSubmit = (e: React.FormEvent) => {
+  const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    showToast("Message sent!", "We'll get back to you within 24 hours.");
-    setFormData({ name: '', email: '', message: '' });
+    setIsSubmitting(true);
+
+    const { error } = await supabase
+      .from('contact_messages')
+      .insert([
+        {
+          name: formData.name,
+          email: formData.email,
+          message: formData.message
+        }
+      ]);
+
+    setIsSubmitting(false);
+
+    if (error) {
+      console.error('Contact error:', error);
+      showToast("Error", "Failed to send message. Please try again.");
+    } else {
+      showToast("Message sent!", "We'll get back to you within 24 hours.");
+      setFormData({ name: '', email: '', message: '' });
+    }
   };
 
   return (
@@ -222,10 +243,17 @@ const ContactSection = ({ className = '' }: ContactSectionProps) => {
                 </div>
                 <Button
                   type="submit"
-                  className="w-full bg-[#D4A72C] hover:bg-[#e5b83d] text-[#111C16] rounded-full py-6 flex items-center justify-center gap-2"
+                  disabled={isSubmitting}
+                  className="w-full bg-[#D4A72C] hover:bg-[#e5b83d] text-[#111C16] rounded-full py-6 flex items-center justify-center gap-2 transition-all active:scale-95"
                 >
-                  Send message
-                  <Send className="w-4 h-4" />
+                  {isSubmitting ? (
+                    <Loader2 className="w-5 h-5 animate-spin" />
+                  ) : (
+                    <>
+                      Send message
+                      <Send className="w-4 h-4" />
+                    </>
+                  )}
                 </Button>
               </form>
             </div>
