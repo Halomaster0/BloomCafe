@@ -1,0 +1,163 @@
+@import url('https://fonts.googleapis.com/css2?family=Cormorant+Garamond:wght@400;500;600;700&family=Inter:wght@300;400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap');
+
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  :root {
+    --background: 48 33% 96%;
+    --foreground: 150 20% 9%;
+    --card: 48 33% 96%;
+    --card-foreground: 150 20% 9%;
+    --popover: 48 33% 96%;
+    --popover-foreground: 150 20% 9%;
+    --primary: 150 96% 12%;
+    --primary-foreground: 48 33% 96%;
+    --secondary: 150 10% 45%;
+    --secondary-foreground: 48 33% 96%;
+    --muted: 48 20% 90%;
+    --muted-foreground: 150 10% 45%;
+    --accent: 43 68% 50%;
+    --accent-foreground: 150 20% 9%;
+    --destructive: 0 84.2% 60.2%;
+    --destructive-foreground: 0 0% 98%;
+    --border: 150 10% 80%;
+    --input: 150 10% 80%;
+    --ring: 43 68% 50%;
+    --radius: 1.75rem;
+
+    --bloom-ivory: #F7F6F2;
+    --bloom-forest: #013A1E;
+    --bloom-gold: #D4A72C;
+    --bloom-dark: #111C16;
+    --bloom-sage: #6B7A70;
+  }
+}
+
+@layer base {
+  * {
+    @apply border-border;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+
+  body {
+    @apply bg-[#F7F6F2] text-[#111C16] antialiased;
+    font-family: 'Inter', sans-serif;
+    overflow-x: hidden;
+  }
+
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+  }
+
+  .font-mono {
+    font-family: 'IBM Plex Mono', monospace;
+  }
+}
+
+@layer components {
+  .bloom-heading {
+    font-family: 'Cormorant Garamond', serif;
+    font-weight: 600;
+    letter-spacing: -0.01em;
+    line-height: 0.95;
+  }
+
+  .bloom-body {
+    font-family: 'Inter', sans-serif;
+    font-weight: 400;
+    line-height: 1.55;
+  }
+
+  .bloom-label {
+    font-family: 'IBM Plex Mono', monospace;
+    font-weight: 500;
+    font-size: 12px;
+    text-transform: uppercase;
+    letter-spacing: 0.18em;
+  }
+
+  .bloom-card {
+    border-radius: 28px;
+    overflow: hidden;
+    box-shadow: 0 18px 50px rgba(0, 0, 0, 0.10);
+  }
+
+  .bloom-button {
+    @apply px-8 py-3 rounded-full font-medium transition-all duration-300;
+  }
+
+  .bloom-button-primary {
+    @apply bloom-button bg-[#013A1E] text-[#F7F6F2] hover:bg-[#025c30];
+  }
+
+  .bloom-button-outline {
+    @apply bloom-button border-2 border-[#013A1E] text-[#013A1E] hover:bg-[#013A1E] hover:text-[#F7F6F2];
+  }
+
+  .bloom-button-gold {
+    @apply bloom-button bg-[#D4A72C] text-[#111C16] hover:bg-[#e5b83d];
+  }
+
+  .grain-overlay {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    pointer-events: none;
+    z-index: 9999;
+    opacity: 0.04;
+    mix-blend-mode: multiply;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");
+  }
+
+  .botanical-outline {
+    position: absolute;
+    pointer-events: none;
+    opacity: 0.12;
+  }
+
+  .section-pinned {
+    position: relative;
+    width: 100%;
+    min-height: auto;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    padding: 8vh 0;
+  }
+
+  @media (min-width: 1024px) {
+    .section-pinned {
+      min-height: 80vh;
+      padding: 12vh 0;
+    }
+  }
+
+  .section-flowing {
+    position: relative;
+    width: 100%;
+    padding: 8vh 0;
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
+  }
+}

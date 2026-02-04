@@ -1,0 +1,100 @@
+/* The Bloom Coffee - App Styles */
+
+/* Smooth scrolling */
+html {
+  scroll-behavior: smooth;
+}
+
+/* Custom scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+}
+
+::-webkit-scrollbar-track {
+  background: #F7F6F2;
+}
+
+::-webkit-scrollbar-thumb {
+  background: #013A1E;
+  border-radius: 4px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+  background: #025c30;
+}
+
+/* Selection color */
+::selection {
+  background: #013A1E;
+  color: #F7F6F2;
+}
+
+/* Focus styles */
+*:focus-visible {
+  outline: 2px solid #D4A72C;
+  outline-offset: 2px;
+}
+
+/* Image loading placeholder */
+img {
+  background: linear-gradient(135deg, #f0efe9 0%, #e8e7e1 100%);
+}
+
+/* Prevent text selection on decorative elements */
+.botanical-outline {
+  user-select: none;
+  pointer-events: none;
+}
+
+/* Grain overlay enhancement */
+.grain-overlay {
+  will-change: opacity;
+}
+
+/* Card hover effects */
+.bloom-card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.bloom-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 22px 60px rgba(0, 0, 0, 0.12);
+}
+
+/* Button press effect */
+.bloom-button:active,
+.bloom-button-primary:active,
+.bloom-button-outline:active,
+.bloom-button-gold:active {
+  transform: scale(0.98);
+}
+
+/* Responsive typography adjustments */
+@media (max-width: 768px) {
+  .bloom-heading {
+    line-height: 1.0;
+  }
+  
+  .section-pinned {
+    min-height: 100vh;
+    min-height: 100dvh;
+  }
+}
+
+/* Reduced motion preferences */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
+  }
+}
+
+/* Dialog overlay styling */
+[data-state="open"] > [data-radix-dialog-overlay] {
+  background: rgba(1, 58, 30, 0.4);
+  backdrop-filter: blur(4px);
+}
