@@ -3,6 +3,8 @@ import { gsap } from 'gsap';
 import { ScrollTrigger } from 'gsap/ScrollTrigger';
 import { QrCode, CreditCard, Truck, ArrowRight } from 'lucide-react';
 
+gsap.registerPlugin(ScrollTrigger);
+
 interface TableOrderSectionProps {
   className?: string;
 }
