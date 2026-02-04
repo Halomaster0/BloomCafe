@@ -71,15 +71,32 @@ const ControllerView = () => {
     useEffect(() => {
         fetchData();
 
-        // Real-time subscriptions
-        const ordersSub = supabase.channel('orders_realtime').on('postgres_changes' as any, { event: '*', table: 'orders', schema: 'public' }, () => fetchData(true)).subscribe();
-        const reservationsSub = supabase.channel('reservations_realtime').on('postgres_changes' as any, { event: '*', table: 'reservations', schema: 'public' }, () => fetchData(true)).subscribe();
-        const messagesSub = supabase.channel('messages_realtime').on('postgres_changes' as any, { event: '*', table: 'contact_messages', schema: 'public' }, () => fetchData(true)).subscribe();
+        // Consolidated Real-time Channel (More reliable)
+        const staffChannel = supabase.channel('staff_hub_updates')
+            .on('postgres_changes' as any, {
+                event: '*',
+                table: 'orders',
+                schema: 'public'
+            }, (payload: any) => {
+                console.log('Order Event Received:', payload);
+                fetchData(true);
+            })
+            .on('postgres_changes' as any, {
+                event: '*',
+                table: 'reservations',
+                schema: 'public'
+            }, () => fetchData(true))
+            .on('postgres_changes' as any, {
+                event: '*',
+                table: 'contact_messages',
+                schema: 'public'
+            }, () => fetchData(true))
+            .subscribe((status) => {
+                console.log('Subscription Status:', status);
+            });
 
         return () => {
-            supabase.removeChannel(ordersSub);
-            supabase.removeChannel(reservationsSub);
-            supabase.removeChannel(messagesSub);
+            supabase.removeChannel(staffChannel);
         };
     }, []);
 
