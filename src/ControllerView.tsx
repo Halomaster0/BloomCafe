@@ -73,12 +73,12 @@ const ControllerView = () => {
 
         // Consolidated Real-time Channel (More reliable)
         const staffChannel = supabase.channel('staff_hub_updates')
-            .on('postgres_changes' as any, {
-                event: '*',
-                table: 'orders',
-                schema: 'public'
-            }, (payload: any) => {
-                console.log('Order Event Received:', payload);
+            .on('postgres_changes' as any, { event: 'INSERT', table: 'orders', schema: 'public' }, (p: any) => {
+                console.log('NEW ORDER:', p);
+                fetchData(true);
+            })
+            .on('postgres_changes' as any, { event: 'UPDATE', table: 'orders', schema: 'public' }, (p: any) => {
+                console.log('ORDER UPDATE:', p);
                 fetchData(true);
             })
             .on('postgres_changes' as any, {
@@ -91,8 +91,9 @@ const ControllerView = () => {
                 table: 'contact_messages',
                 schema: 'public'
             }, () => fetchData(true))
-            .subscribe((status) => {
+            .subscribe((status, err) => {
                 console.log('Subscription Status:', status);
+                if (err) console.error('Subscription Error:', err);
             });
 
         return () => {
